@@ -1,0 +1,156 @@
+version: "3.9"
+
+services:
+  memcached:
+    container_name: docker-memcached
+    image: memcached:latest
+    restart: unless-stopped
+    platform: linux/amd64
+    ports:
+      - "11211:11211"
+    volumes:
+      - memcached_data:/data
+
+  redis:
+    container_name: docker-redis
+    image: redis:latest
+    restart: unless-stopped
+    platform: linux/amd64
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD="root"
+    volumes:
+      - redis_data:/data
+
+  rabbitmq:
+    container_name: docker-rabbitmq
+    image: rabbitmq:latest
+    restart: unless-stopped
+    platform: linux/amd64
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  mongodb:
+    container_name: docker-mongodb
+    image: mongo:latest
+    restart: unless-stopped
+    platform: linux/amd64
+    ports:
+      - "27017:27017"
+    environment:
+      MONGODB_ADVERTISED_HOSTNAME: 127.0.0.1
+      MONGODB_REPLICA_SET_MODE: primary
+      MONGODB_REPLICA_SET_KEY: replicasetkey123
+    volumes:
+      - mongo-config-data:/data/configdb
+      - mongo-data:/data/db
+
+  dynamodb:
+    container_name: docker-dynamodb
+    image: amazon/dynamodb-local:latest
+    platform: linux/amd64
+    ports:
+      - "8000:8000"
+    command: "-jar DynamoDBLocal.jar -sharedDb -inMemory -port 8000"
+    volumes:
+      - dynamodb-data:/dynamodb_local_db
+
+  mysql:
+    container_name: docker-mysqldb
+    image: mysql:latest
+    restart: unless-stopped
+    platform: linux/amd64
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  mariadb:
+    container_name: docker-mariadb
+    image: mariadb:latest
+    restart: unless-stopped
+    platform: linux/amd64
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - mariadb-data:/var/lib/mysql
+
+  postgresql:
+    container_name: docker-postgresql
+    image: postgres:latest
+    restart: unless-stopped
+    platform: linux/amd64
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    volumes:
+      - postgresql-data:/var/lib/postgresql/data
+
+#  oracledb:
+#    container_name: docker-oracledb
+#    image: container-registry.oracle.com/database/express:latest
+#    environment:
+#      - ORACLE_SID=ORCLCDB
+#      - ORACLE_PDB=ORCLPDB1
+#      - ORACLE_PWD=Oracle_123
+#    ports:
+#      - "1521:1521"
+#      - "5500:5500"
+#    platform: linux/amd64
+#    volumes:
+#      - oracle-data:/opt/oracle/oradata
+#      - oracle-backup:/opt/oracle/backup
+#    healthcheck:
+#      test: ["CMD", "sqlplus", "-L", "sys/Oracle_123@//localhost:1521/ORCLCDB as sysdba", "@healthcheck.sql"]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 5
+#
+#  mssql:
+#    container_name: docker-mssql
+#    image: mcr.microsoft.com/mssql/server
+#    user: root
+#    ports:
+#      - "1433:1433"
+#    environment:
+#      ACCEPT_EULA: "Y"
+#      SA_PASSWORD: root
+#    platform: linux/amd64
+#    volumes:
+#      - mssql_data:/var/opt/mssql/data
+
+volumes:
+  memcached_data:
+    driver: local
+  redis_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+  mongo-data:
+    driver: local
+  dynamodb-data:
+    driver: local
+  mongo-config-data:
+    driver: local
+  mysql-data:
+    driver: local
+  mariadb-data:
+    driver: local
+  postgresql-data:
+    driver: local
+  oracle-data:
+    driver: local
+  oracle-backup:
+    driver: local
+  mssql_data:
+    driver: local
